@@ -1,0 +1,66 @@
+<div x-data="blueskyComments"
+     data-at-uri="{{ at_uri }}">
+
+    <div>
+        <div class="flex items-center gap-4">
+            {{# LIKES: HEART #}}
+            <div class="flex items-center gap-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-red-500">
+                    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>
+                </svg>
+                <span><span x-text="likeCount"></span> likes</span>
+            </div>
+
+            {{# REPOSTS: ARROW PATH #}}
+            <div class="flex items-center gap-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-green-500">
+                    <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd" />
+                </svg>
+                <span><span x-text="repostCount"></span> reposts</span>
+            </div>
+
+            {{# REPLIES: CHAT BUBBLE LEFT #}}
+            <div class="flex items-center gap-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-blue-500">
+                    <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97-1.94.284-3.916.455-5.922.505a.39.39 0 0 0-.266.112L8.78 21.53A.75.75 0 0 1 7.5 21v-3.955a48.842 48.842 0 0 1-2.652-.316c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z" clip-rule="evenodd" />
+                </svg>
+                <span><span x-text="replyCount"></span> comments</span>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mt-6 text-xl font-bold">Comments</h2>
+    <p class="mt-2 text-sm">
+        <a href="{{ bluesky_thread_uri }}"
+           class="underline"
+           target="_blank"
+           rel="noreferrer noopener">
+            Reply on Bluesky</a> to join the conversation.
+    </p>
+
+    <hr class="mt-6"/>
+
+    <template x-if="!loading && replies.length">
+        <div class=" space-y-6">
+            <template x-for="(comment, index) in replies" :key="index">
+                <div x-bluesky-comment></div>
+            </template>
+
+            <template x-if="hasMoreReplies">
+            <button @click.prevent="showMore"
+                    :disabled="!hasMoreReplies"
+                    class="mt-2 text-sm text-blue-500 underline">
+                Show more comments
+            </button>
+            </template>
+        </div>
+    </template>
+
+    <template x-if="!loading && !replies.length">
+        <div class="text-sm pt-4 text-gray-500">There are no comments</div>
+    </template>
+
+    <template x-if="loading">
+        <div class="text-sm pt-4 italic text-gray-500">Loading comments...</div>
+    </template>
+</div>

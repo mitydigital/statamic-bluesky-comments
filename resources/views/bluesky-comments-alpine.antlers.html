@@ -1,0 +1,205 @@
+{{ once }}
+<script>
+    document.addEventListener('alpine:init', () => {
+
+        Alpine.directive('bluesky-comment', (el, { value, modifiers, expression }, { Alpine, effect, evaluate, evaluateLater, cleanup }) => {
+
+            let template = `<div class="space-y-2 text-sm">
+
+                <a :href="'https://bsky.app/profile/' + author.did"
+                    class="flex items-center gap-x-2 hover:underline"
+                    target="_blank">
+                    <template x-if="author.avatar">
+                        <img :alt="author.displayName"
+                             :src="author.avatar"
+                             class="size-5 shrink-0 rounded-full bg-gray-200"/>
+                    </template>
+                    <span x-text="author.displayName"></span>
+                    <span>
+                        @<span x-text="author.handle"></span>
+                    </span>
+                </a>
+
+                <div>
+                    <a :href="link" target="_blank" x-text="comment.post.record.text"></a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <a :href="link"
+                       target="_blank"
+                       class="flex items-center gap-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 text-blue-500">
+                          <path fill-rule="evenodd" d="M3.43 2.524A41.29 41.29 0 0 1 10 2c2.236 0 4.43.18 6.57.524 1.437.231 2.43 1.49 2.43 2.902v5.148c0 1.413-.993 2.67-2.43 2.902a41.202 41.202 0 0 1-5.183.501.78.78 0 0 0-.528.224l-3.579 3.58A.75.75 0 0 1 6 17.25v-3.443a41.033 41.033 0 0 1-2.57-.33C1.993 13.244 1 11.986 1 10.573V5.426c0-1.413.993-2.67 2.43-2.902Z" clip-rule="evenodd" />
+                        </svg>
+                        <span x-text="comment.post.replyCount"></span>
+                    </a>
+
+                    <a :href="link"
+                       target="_blank"
+                       class="flex items-center gap-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 text-green-500">
+                          <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clip-rule="evenodd" />
+                        </svg>
+                        <span x-text="comment.post.repostCount"></span>
+                    </a>
+
+                    <a :href="link"
+                       target="_blank"
+                       class="flex items-center gap-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 text-red-500">
+                          <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z" />
+                        </svg>
+                        <span x-text="comment.post.likeCount"></span>
+                    </a>
+                </div>
+
+                <template x-if="comment.replies && comment.replies.length > 0">
+                    <div class="border-l border-gray-300 py-1 ml-1.5 pl-2">
+                        <div class="-mt-4 space-y-6">
+                            <template x-for="(comment, index) in comment.replies" :key="index">
+                                <div x-bluesky-comment></div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+            </div>`;
+
+            let data = {
+                init(){
+                    this.author = this.comment.post.author;
+                    this.link = 'https://bsky.app/profile/' + this.comment.post.author.did + '/post/' + this.comment.post.uri.split("/").pop()
+                },
+
+                author: null,
+                html: template,
+                link: ''
+            }
+
+            let reactiveData = Alpine.reactive(data);
+            let destroyScope = Alpine.addScopeToNode(el, reactiveData);
+
+            Alpine.nextTick( () => {
+                Alpine.bind(el, {'x-html': 'html'});
+            });
+
+            evaluate(reactiveData['init']);
+        });
+
+        Alpine.data('blueskyComments', () => ({
+
+            atUri: null,
+            loading: false,
+            _thread: null,
+
+            showIncrement: 5,
+            show: 5,
+
+            init() {
+                this.atUri = this.$el.dataset.atUri;
+
+                if (!this.atUri) {
+                    return;
+                }
+
+                this.showIncrement = parseInt(this.$el.dataset.showIncrement ?? 5);
+                if (isNaN(this.showIncrement)) {
+                    console.log('The show increment must be a valid number.');
+                    return;
+                }
+
+                this.show = this.showIncrement;
+
+                this.loading = true;
+                this.load(this.atUri);
+            },
+
+            showMore() {
+                this.show += this.showIncrement;
+            },
+
+            async load(uri) {
+                let params = new URLSearchParams({uri})
+                const response = await fetch('https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread?' + params.toString(), {
+                    method: 'GET',
+                    headers: {
+                        "Accept": "application/json",
+                    },
+                    cache: "no-store",
+                })
+                if (! response.ok) {
+                    console.log(`Something went wrong: ${response.status} - ${response.statusText}`)
+                    this.loading = false;
+                    return;
+                }
+                data = await response.json()
+
+                this._thread = data.thread;
+                this._thread.replies = this._thread.replies
+                    .sort((a, b) => this.sortByLikes(a, b))
+                    .filter((reply) => {
+                        return this.isThreadViewPost(reply)
+                    });
+
+                this.loading = false;
+            },
+
+            isThreadViewPost(thread){
+                return (
+                    typeof thread === 'object' && thread !== null &&
+                    thread.hasOwnProperty('$type') &&
+                    thread.$type === 'app.bsky.feed.defs#threadViewPost'
+                )
+            },
+
+            sortByLikes(a, b){
+                if (
+                    !this.isThreadViewPost(a) ||
+                    !this.isThreadViewPost(b)
+                ) {
+                    return 0;
+                }
+                return (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0)
+            },
+
+            get hasMoreReplies() {
+                if (this.show < this._thread?.replies?.length) {
+                    return true;
+                }
+                return false;
+            },
+
+            get replies() {
+                if (this._thread) {
+                    return this._thread.replies
+                        .slice(0, this.show);
+                }
+
+                return [];
+            },
+
+            get likeCount() {
+                if (this._thread) {
+                    return this._thread.post.likeCount.toLocaleString();
+                }
+                return 0;
+            },
+
+            get replyCount() {
+                if (this._thread) {
+                    return this._thread.post.replyCount.toLocaleString();
+                }
+                return 0;
+            },
+
+            get repostCount() {
+                if (this._thread) {
+                    return this._thread.post.repostCount.toLocaleString();
+                }
+                return 0;
+            }
+
+        }));
+    });
+</script>
+{{ /once }}
