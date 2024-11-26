@@ -48,6 +48,9 @@ You don't need to publish views: but you can if you want to make changes.
 php artisan vendor:publish --tag=statamic-bluesky-comments-views
 ```
 
+**If you're using the built-in views only** (i.e. not including them in your actual project) 
+don't forget to update your Tailwind config to include the layout files in the vendor folder.
+
 ### Layout
 
 The `bluesky-comments.antlers.html` file includes the main layout for the Comments component.
