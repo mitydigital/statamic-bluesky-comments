@@ -16,6 +16,14 @@ class BlueskyComments extends Tags
             return '';
         }
 
+        if (is_object($bluesky_thread_uri) && method_exists($bluesky_thread_uri, 'value')) {
+            $bluesky_thread_uri = $bluesky_thread_uri->value();
+
+            if (! $bluesky_thread_uri) {
+                return '';
+            }
+        }
+
         preg_match('/https:\/\/bsky.app\/profile\/(\S+)\/post\/(\S+)/', $bluesky_thread_uri, $matches);
         if (count($matches) !== 3) {
             Log::error('Invalid Bluesky Thread URI provided: '.$bluesky_thread_uri);
