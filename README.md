@@ -78,6 +78,9 @@ This is in the `bluesky-comments-alpine.antlers.html` file, and is the data defi
 Written for Statamic:
 - [Marty Friedel](https://github.com/martyf)
 
+Contributions from:
+- [Eser Deniz](https://github.com/SRWieZ)
+
 Inspired by [Emily Liu](https://bsky.app/profile/emilyliu.me/post/3lbqta5lnck2i)
 
 Icons are lovingly used from [HeroIcons](https://heroicons.com)
