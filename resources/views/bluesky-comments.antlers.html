@@ -38,20 +38,20 @@
             Reply on Bluesky</a> to join the conversation.
     </p>
 
-    <hr class="mt-6"/>
+    <hr class="my-6"/>
 
     <template x-if="!loading && replies.length">
-        <div class=" space-y-6">
+        <div class="mt-6 flex flex-col gap-y-4">
             <template x-for="(comment, index) in replies" :key="index">
                 <div x-bluesky-comment></div>
             </template>
 
             <template x-if="hasMoreReplies">
-            <button @click.prevent="showMore"
-                    :disabled="!hasMoreReplies"
-                    class="mt-2 text-sm text-blue-500 underline">
-                Show more comments
-            </button>
+                <button @click.prevent="showMore"
+                        :disabled="!hasMoreReplies"
+                        class="mt-2 text-sm text-blue-500 underline">
+                    Show more comments
+                </button>
             </template>
         </div>
     </template>
