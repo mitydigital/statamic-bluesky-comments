@@ -38,10 +38,10 @@
             Reply on Bluesky</a> to join the conversation.
     </p>
 
-    <hr class="mt-6"/>
+    <hr class="my-6"/>
 
     <template x-if="!loading && replies.length">
-        <div class=" space-y-6">
+        <div class="space-y-6">
             <template x-for="(comment, index) in replies" :key="index">
                 <div x-bluesky-comment></div>
             </template>

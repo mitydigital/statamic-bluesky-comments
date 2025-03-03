@@ -58,7 +58,7 @@
 
                 <template x-if="comment.replies && comment.replies.length > 0">
                     <div class="border-l border-gray-300 py-1 ml-1.5 pl-2">
-                        <div class="-mt-4 space-y-6">
+                        <div class="mt-2 space-y-6">
                             <template x-for="(comment, index) in comment.replies" :key="index">
                                 <div x-bluesky-comment></div>
                             </template>
