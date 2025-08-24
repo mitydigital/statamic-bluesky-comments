@@ -3,6 +3,7 @@
 <!-- statamic:hide -->
 
 ![Statamic 5](https://img.shields.io/badge/Statamic-5.0-FF269E?style=for-the-badge&link=https://statamic.com)
+![Statamic 6](https://img.shields.io/badge/Statamic-6.0-FF269E?style=for-the-badge&link=https://statamic.com)
 [![Bluesky Comments for Statamic on Packagist](https://img.shields.io/packagist/v/mitydigital/statamic-bluesky-comments?style=for-the-badge)](https://packagist.org/packages/mitydigital/statamic-bluesky-comments/stats)
 
 ---
